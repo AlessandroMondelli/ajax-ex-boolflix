@@ -13,16 +13,20 @@
 
     <body>
         <header>
-            <h1>Boolflix</h1>
+            <div id="head">
+                <div id="logo">
+                    <h1><a href="index.html">Boolflix</a></h1>
+                </div>
+                <div id="right-menu">
+                    <div class="research">
+                        <input type="text" name="research" placeholder="Inserisci Titolo">
+                        <a class="button">Search</a>
+                    </div>
+                </div>
+            </div>
         </header>
         <main>
-            <div class="research">
-                <input type="text" name="research" placeholder="Inserisci Titolo">
-                <a class="button">Search</a>
-            </div>
-            <div class="results">
-
-            </div>
+            <div class="results"></div>
         </main>
 
         <script id="boolflix-template" type="text/x-handlebars-template">

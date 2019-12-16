@@ -5,25 +5,44 @@
     font-family: 'Nanum Gothic', sans-serif;
 }
 
+/*** HEADER ***/
 header {
-    height: 70px;
     background-color: black;
+}
+
+#head {
+    height: 70px;
     line-height: 70px;
+    width: 99%;
+    margin: 0 auto;
+}
+
+#head #logo {
+    float: left;
+}
+
+#logo h1 a{
+    text-decoration: none;
     color: red;
 }
 
-main {
-    height: calc(100vh - 70px);
+#head #right-menu {
+    float: right;
 }
 
-input, a {
+.research input, .button {
     margin-top: 20px;
 }
 
-a {
+.button {
     background-color: lightgrey;
     cursor: pointer;
     border: 1px solid grey;
+}
+
+/*** MAIN ***/
+main {
+    height: calc(100vh - 70px);
 }
 
 .results {
