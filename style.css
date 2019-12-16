@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+header {
+    height: 70px;
+    background-color: black;
+    line-height: 70px;
+    color: red;
+}
+
+main {
+    height: calc(100vh - 70px);
+}
+
+input, a {
+    margin-top: 20px;
+}
+
+a {
+    background-color: lightgrey;
+    cursor: pointer;
+    border: 1px solid grey;
+}
+
+.results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.card {
+    margin-top: 20px;
+    height: 200px;
+    width: 300px;
+    border: 1px solid black;
+}

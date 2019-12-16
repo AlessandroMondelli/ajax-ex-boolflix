@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Boolflix</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.min.js"></script>
+        <script src="https://kit.fontawesome.com/8fa0586f23.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="main.js" charset="utf-8"></script>
+        <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <header>
+            <h1>Boolflix</h1>
+        </header>
+        <main>
+            <div class="research">
+                <input type="text" name="research" placeholder="Inserisci Titolo">
+                <a class="button">Search</a>
+            </div>
+            <div class="results">
+
+            </div>
+        </main>
+
+        <script id="boolflix-template" type="text/x-handlebars-template">
+                <div class="card">
+                    <h2 class="title">{{ boolTitle }}</h2>
+                    <p class="original-title">{{ boolOrTitle }}</p>
+                    <p class="language">{{ boolLang }}</p>
+                    <p class="vote">{{ boolVote }}</p>
+                </div>
+        </script>
+    </body>
+</html>
