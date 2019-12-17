@@ -5,6 +5,12 @@
     font-family: 'Nanum Gothic', sans-serif;
 }
 
+.clearfix {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 /*** HEADER ***/
 header {
     background-color: black;
@@ -13,7 +19,7 @@ header {
 #head {
     height: 70px;
     line-height: 70px;
-    width: 99%;
+    width: 98%;
     margin: 0 auto;
 }
 
@@ -21,7 +27,7 @@ header {
     float: left;
 }
 
-#logo h1 a{
+#logo h1 a {
     text-decoration: none;
     color: red;
 }
@@ -30,14 +36,21 @@ header {
     float: right;
 }
 
+.research input {
+    height: 30px;
+    width: 190px;
+    margin-right: 10px;
+}
+
 .research input, .button {
     margin-top: 20px;
 }
 
 .button {
-    background-color: lightgrey;
+    color: lightgrey;
     cursor: pointer;
-    border: 1px solid grey;
+    margin-right: 20px;
+    font-size: 20px;
 }
 
 /*** MAIN ***/
@@ -46,6 +59,8 @@ main {
 }
 
 .results {
+    width: 80%;
+    margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;

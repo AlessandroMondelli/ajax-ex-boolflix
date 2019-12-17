@@ -13,14 +13,14 @@
 
     <body>
         <header>
-            <div id="head">
+            <div id="head" class="clearfix">
                 <div id="logo">
                     <h1><a href="index.html">Boolflix</a></h1>
                 </div>
                 <div id="right-menu">
-                    <div class="research">
+                    <div class="research clearfix">
                         <input type="text" name="research" placeholder="Inserisci Titolo">
-                        <a class="button">Search</a>
+                        <a class="button"><i class="fas fa-search"></i></a>
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                     <h2 class="title">{{ boolTitle }}</h2>
                     <p class="original-title">{{ boolOrTitle }}</p>
                     <p class="language">{{ boolLang }}</p>
-                    <p class="vote">{{ boolVote }}</p>
+                    <p class="vote">{{{ boolVote }}}</p>
                 </div>
         </script>
     </body>
