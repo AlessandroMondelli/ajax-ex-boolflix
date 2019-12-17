@@ -72,22 +72,23 @@ $(document).ready(function() {
     }
 
     function appendFilm(filmArr,flag) { //Funzione che stampa film trovati
+        var filmPosition = $(".results.film"); //salvo la posizione dove dovranno essere inseriti i film
+        var seriePosition = $(".results.series"); //salvo la posizione dove dovranno essere inserite le serie
+
         for (var i = 0; i < filmArr.length; i++) { //Scorro tutti i film trovati con la ricerca
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
             // var flag = setFlags(filmArr[i].original_language);
-            if (flag == true) {
-                var printTemplate = objTemplate(filmArr[i],starsVote);
-                var filmPosition = $(".results.film");
-                printHtml(printTemplate,filmPosition);
-            } else {
-                var printTemplate = objTemplateSerie(filmArr[i],starsVote);
-                var seriePosition = $(".results.series");
-                printHtml(printTemplate,seriePosition);
+            if (flag == true) { //Se è un film...
+                var printTemplate = objTemplate(filmArr[i],starsVote); //Chiamo funzione per scrivere template film
+                printHtml(printTemplate,filmPosition); //richiamo funzione per appendere film nell'html
+            } else { //Se è una serie...
+                var printTemplate = objTemplateSerie(filmArr[i],starsVote); //Chiamo funzione per scrivere template serie
+                printHtml(printTemplate,seriePosition); //richiamo funzione per appendere serie nell'html
             }
         }
     }
 
-    function objTemplate(actFilm,stampVote) {
+    function objTemplate(actFilm,stampVote) { //Funzione che prepara template film
         var print = { //Oggetto per prendere variabili Handlebars
             boolTitle : actFilm.title, //recupero titolo
             boolOrTitle : actFilm.original_title, //Recupero titolo originale
@@ -97,7 +98,7 @@ $(document).ready(function() {
         return print;
     }
 
-    function objTemplateSerie(actFilm,stampVote) {
+    function objTemplateSerie(actFilm,stampVote) { //Funzione che prepara template serie
         var print = { //Oggetto per prendere variabili Handlebars
             boolTitle : actFilm.name, //recupero titolo
             boolOrTitle : actFilm.original_name, //Recupero titolo originale
@@ -107,9 +108,9 @@ $(document).ready(function() {
         return print;
     }
 
-    function printHtml(templateP,position) {
+    function printHtml(templateP,position) { //Funzione he stampa su html
         var printHtml = template(templateP); //Metto in una variabile il template creato con la funzione handlebars
-        position.append(printHtml); //Appendo template nel container delle canzoni
+        position.append(printHtml); //Appendo template nel container delle serie o dei film
     }
 
     function voteToStars(vote) { //Funzione che restituisce il voto in stelle
