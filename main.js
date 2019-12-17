@@ -74,7 +74,14 @@ $(document).ready(function() {
             retVote = forStars(0,5);
         } else if (vote >= 1 && vote < 3) {
             retVote = forStars(1,4);
-            console.log("SI");
+        } else if (vote >= 3 && vote < 5) {
+            retVote = forStars(2,3);
+        } else if (vote >= 5 && vote < 7) {
+            retVote = forStars(3,2);
+        } else if (vote >= 7 && vote < 9) {
+            retVote = forStars(4,1);
+        } else if (vote >= 9 && vote < 10) {
+            retVote = forStars(5,0);
         }
 
         return retVote;
