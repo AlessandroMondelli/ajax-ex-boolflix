@@ -27,16 +27,16 @@
         </header>
         <main>
             <div class="results film"></div>
-            <hr>
+            <br><hr>
             <div class="results series"></div>
         </main>
 
         <script id="boolflix-template" type="text/x-handlebars-template">
                 <div class="card">
                     <h2 class="title">{{ boolTitle }}</h2>
-                    <p class="original-title">{{ boolOrTitle }}</p>
-                    <p class="language">{{ boolLang }}</p>
-                    <p class="vote">{{{ boolVote }}}</p>
+                    <p class="original-title">Titolo originale: {{ boolOrTitle }}</p>
+                    <p class="language">Lingua: {{ boolLang }}</p>
+                    <p class="vote">Voto: {{{ boolVote }}}</p>
                 </div>
         </script>
     </body>
