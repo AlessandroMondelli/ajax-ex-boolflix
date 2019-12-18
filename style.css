@@ -36,6 +36,11 @@ header {
     float: right;
 }
 
+.research {
+    text-align: right;
+    color: white;
+}
+
 .research input {
     height: 30px;
     width: 190px;
@@ -44,6 +49,18 @@ header {
 
 .research input, .button {
     margin-top: 20px;
+}
+
+.research .fa-bell {
+    margin-right: 20px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.research img {
+    width: 8%;
+    vertical-align: middle;
+    cursor: pointer;
 }
 
 .button {
@@ -58,18 +75,31 @@ main {
     height: calc(100vh - 70px);
 }
 
+#hot-now {
+    margin-top: 20px;
+}
+
+#hot-now.hidden {
+    display: hidden;
+}
+
+#once-searched {
+    margin-top: 20px;
+    display: none;
+}
+
 .results {
     width: 80%;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
-    margin-top: 20px;
+    margin-top: 15px;
 }
+
 
 .card {
     margin-top: 20px;
-    height: 200px;
     width: 300px;
     border: 1px solid black;
 }

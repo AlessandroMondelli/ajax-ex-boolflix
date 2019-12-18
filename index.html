@@ -21,23 +21,44 @@
                     <div class="research clearfix">
                         <input type="text" name="research" placeholder="Inserisci Titolo">
                         <a class="button"><i class="fas fa-search"></i></a>
+                        <i class="fas fa-bell"></i>
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQR44Cjeu7UoYxGbfwbmsMR4apa6A53miwHzQYjFHKyTyx98Sb9" alt="user img">
                     </div>
                 </div>
             </div>
         </header>
         <main>
-            <div class="results film"></div>
-            <br><hr>
-            <div class="results series"></div>
+            <div id="hot-now">
+                <div class="sec film">
+                    <h2>I titoli del momento</h2>
+                    <div class="results-now"></div>
+                </div>
+                <div class="sec series">
+                    <h2>Serie Tv del momento</h2>
+                    <div class="results-now"></div>
+                </div>
+            </div>
+            <div id="once-searched">
+                <div class="sec film">
+                    <h2>Film</h2>
+                    <div class="results"></div>
+                </div>
+                <div class="sec series">
+                    <h2>Serie Tv</h2>
+                    <div class="results"></div>
+                </div>
+            </div>
         </main>
 
         <script id="boolflix-template" type="text/x-handlebars-template">
                 <div class="card">
                     <div class="poster">{{{ boolPoster }}}</div>
-                    <h2 class="title">{{ boolTitle }}</h2>
-                    <p class="original-title">Titolo originale: {{ boolOrTitle }}</p>
-                    <p class="language">Lingua: {{{ boolLang }}}</p>
-                    <p class="vote">Voto: {{{ boolVote }}}</p>
+                    <div class="info">
+                        <h3 class="title">{{ boolTitle }}</h2>
+                        <p class="original-title">Titolo originale: {{ boolOrTitle }}</p>
+                        <p class="language">Lingua: {{{ boolLang }}}</p>
+                        <p class="vote">Voto: {{{ boolVote }}}</p>
+                    </div>
                 </div>
         </script>
     </body>

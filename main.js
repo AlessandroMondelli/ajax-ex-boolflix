@@ -21,12 +21,19 @@ $(document).ready(function() {
         }
     });
 
+    // $( ".research input" )
+
 
                         //*** FUNZIONI ***//
     function getSearch() { //Funzione che prende valore dell'input
+        var hotNowPos = $("#hot-now"); //Posizione sezione hot now
+        var searchedPos = $("#once-searched"); //Posizone sezione searched
         var ricerca = $(".research input").val(); //Prendo stringa inserita dall'utente
         if (ricerca != "") {
             $(".results").empty(); //Elimino risultati precedenti
+            hideShow(hotNowPos,searchedPos); //Cambio stato in base alla ricerca
+        } else {
+            hideShow(searchedPos,hotNowPos); //Cambio stato se l'utente cerca una stringa vuota
         }
         $(".research input").val(""); //Elimino testo dopo la ricerca
         return ricerca; //Ritorno il valore ricercato
@@ -49,7 +56,7 @@ $(document).ready(function() {
                     if (films.length != 0) { //Se non è vuoto..
                         appendFilm(films,flagFilm); //Appendo film/serie a html
                     } else { //Altrimenti..
-                        $(".results.film").text("Film o Serie non trovato!"); //stampo un messaggio
+                        $("#once-searched .film .results").text("Film o Serie non trovato!"); //stampo un messaggio
                     }
                 },
                 'error' : function() { //Caso di errore di caricamento
@@ -71,7 +78,7 @@ $(document).ready(function() {
                     if (series.length != 0) { //Se non è vuoto..
                         appendFilm(series,flagFilm); //Appendo film/serie a html
                     } else { //Altrimenti..
-                        $(".results.film").text("Film o Serie non trovato!"); //stampo un messaggio
+                        $("#once-searched .series .results").text("Film o Serie non trovato!"); //stampo un messaggio
                     }
                 },
                 'error' : function() { //Caso di errore di caricamento
@@ -101,7 +108,7 @@ $(document).ready(function() {
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
-            var filmPosition = $(".results.film"); //salvo la posizione dove dovranno essere inseriti i film
+            var filmPosition = $("#once-searched .film .results"); //salvo la posizione dove dovranno essere inseriti i film
             infoAndPosition.push(print,filmPosition); //Metto info e se film/serie su un array
         } else {
             var print = { //Oggetto per prendere variabili Handlebars
@@ -111,7 +118,7 @@ $(document).ready(function() {
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
-            var seriePosition = $(".results.series"); //salvo la posizione dove dovranno essere inserite le serie
+            var seriePosition = $("#once-searched .series .results"); //salvo la posizione dove dovranno essere inserite le serie
             infoAndPosition.push(print,seriePosition); //Metto info e se film/serie su un array
         }
         return infoAndPosition //ritorno array
@@ -157,12 +164,17 @@ $(document).ready(function() {
         return finalVote; //Ritorno codice finale
     }
 
-    function setFlags(flagReq) {
+    function setFlags(flagReq) { //Funzione che setta
         if (flagsAvaible.includes(flagReq)) {
             var retFlag = '<img src="flags/' + flagReq + '.png" alt="Bandiera ' + flagReq +'">';
         } else {
             var retFlag = flagReq;
         }
         return retFlag;
+    }
+
+    function hideShow(x,y) {
+        x.hide();
+        y.show();
     }
 });
