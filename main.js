@@ -2,6 +2,7 @@ $(document).ready(function() {
     var standardUrl = 'https://api.themoviedb.org/3/'; //Url standard da dove recupero API
     var filmUrl = 'search/movie/'; //Sezione dove recupero film
     var serieUrl = 'search/tv'; //Sezione dove recupero serie tv
+    var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','ko','vi','hi']; //Lista bandiere
 
     //Preparo template Handlebars
     var source = $("#boolflix-template").html();
@@ -9,15 +10,14 @@ $(document).ready(function() {
     var template = Handlebars.compile(source);
 
     $(".button").click(function() { //Al click su bottone ricerca
-        apiActive();
+        apiActive(); //Richiamo funzione che attiva tutta la ricerca
     });
 
-    $( ".research input" ).keypress(function(event) {
+    $( ".research input" ).keypress(function(event) { //Alla pressione di invio..
         if (event.which == 13) {
-            apiActive();
+            apiActive(); //Richiamo funzione che attiva tutta la ricercas
         }
     });
-
 
 
                         //*** FUNZIONI ***//
@@ -31,7 +31,7 @@ $(document).ready(function() {
     }
 
     function apiActive() { //Funzione per trovare film tramite API
-        var searchVal = getSearch();
+        var searchVal = getSearch(); //Prendo valore ricerca
         if (searchVal != "") { //Se la ricerca non è vuota...
             $.ajax ({ //Chiamata AJAX per recuperare dati film
                 'url' : standardUrl + filmUrl, //Url per recuperare film
@@ -44,7 +44,12 @@ $(document).ready(function() {
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = true; //Flag che segnala che si stanno cercando dei film
                     var films = result.results;
-                    appendFilm(films,flagFilm);
+                    if (films.length != 0) {
+                        appendFilm(films,flagFilm);
+                    } else {
+                        $(".results.film").text("Film o Serie non trovato!")
+                    }
+
                 },
                 'error' : function() { //Caso di errore di caricamento
                     alert("Errore");
@@ -74,20 +79,19 @@ $(document).ready(function() {
     function appendFilm(filmArr,flagF) { //Funzione che stampa film trovati
         for (var i = 0; i < filmArr.length; i++) { //Scorro tutti i film trovati con la ricerca
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
-            // var flag = setFlags(filmArr[i].original_language);
-            var printAndPos = objTemplate(filmArr[i],starsVote,flagF); //Chiamo funzione per scrivere template film
-            console.log(printAndPos);
+            var langFlag = setFlags(filmArr[i].original_language);
+            var printAndPos = objTemplate(filmArr[i],starsVote,flagF,langFlag); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
         }
     }
 
-    function objTemplate(actFilm,stampVote,flagFS) { //Funzione che prepara template film
+    function objTemplate(actFilm,stampVote,flagFS,lang) { //Funzione che prepara template film
         var infoAndPosition = [];
         if (flagFS == true) {
             var print = { //Oggetto per prendere variabili Handlebars
                 boolTitle : actFilm.title, //recupero titolo
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
-                // boolLang : flag, //Bandiera lingua
+                boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
             var filmPosition = $(".results.film"); //salvo la posizione dove dovranno essere inseriti i film
@@ -96,7 +100,7 @@ $(document).ready(function() {
             var print = { //Oggetto per prendere variabili Handlebars
                 boolTitle : actFilm.name, //recupero titolo
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
-                // boolLang : flag, //Bandiera lingua
+                boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
             var seriePosition = $(".results.series"); //salvo la posizione dove dovranno essere inserite le serie
@@ -119,24 +123,28 @@ $(document).ready(function() {
 
         return retVote; //Ritorno codice con stelle
     }
-});
 
-function forStars(full) { //Funzione che permette di immettere in una variabile un tot di stelle piene e vuote
-    var fullStar = "<i class=\"fas fa-star\"></i>"; //Codice per stella piena
-    var emptyStar = "<i class=\"far fa-star\"></i>" //Codice per stella vuota
-    var finalVote = ""; //Codice che ocnterrà tutte le stelle
+    function forStars(full) { //Funzione che permette di immettere in una variabile un tot di stelle piene e vuote
+        var fullStar = "<i class=\"fas fa-star\"></i>"; //Codice per stella piena
+        var emptyStar = "<i class=\"far fa-star\"></i>" //Codice per stella vuota
+        var finalVote = ""; //Codice che ocnterrà tutte le stelle
 
-    for (var i = 0; i < 5; i++) { //For per scrivere stelle piene
-        if (i < full) {
-            finalVote = finalVote.concat(fullStar);//Concateno stelle piene nella variabile del voto finale
-        } else {
-            finalVote = finalVote.concat(emptyStar); //Concateno stelle piene nella variabile del voto finale
+        for (var i = 0; i < 5; i++) { //For per scrivere stelle piene
+            if (i < full) {
+                finalVote = finalVote.concat(fullStar);//Concateno stelle piene nella variabile del voto finale
+            } else {
+                finalVote = finalVote.concat(emptyStar); //Concateno stelle piene nella variabile del voto finale
+            }
         }
+        return finalVote; //Ritorno codice finale
     }
-    return finalVote; //Ritorno codice finale
-}
 
-    //Non Funzionante
-// function setFlags(flagReq) {
-
-// }
+    function setFlags(flagReq) {
+        if (flagsAvaible.includes(flagReq)) {
+            var retFlag = '<img src="flags/' + flagReq + '.png" alt="Bandiera ' + flagReq +'">';
+        } else {
+            var retFlag = flagReq;
+        }
+        return retFlag;
+    }
+});
