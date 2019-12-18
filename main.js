@@ -2,6 +2,8 @@ $(document).ready(function() {
     var standardUrl = 'https://api.themoviedb.org/3/'; //Url standard da dove recupero API
     var filmUrl = 'search/movie/'; //Sezione dove recupero film
     var serieUrl = 'search/tv'; //Sezione dove recupero serie tv
+    var posterUrl = 'https://image.tmdb.org/t/p/w185' //Sezione dove recupero poster
+    var posterNotAvaible = 'https://uhcl-ir.tdl.org/bitstream/handle/10657.1/1588/not-available.jpg.jpg.jpg?sequence=3&isAllowed=y'; //Immagine in caso di poster mancante
     var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','ko','vi','hi']; //Lista bandiere
 
     //Preparo template Handlebars
@@ -43,13 +45,12 @@ $(document).ready(function() {
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = true; //Flag che segnala che si stanno cercando dei film
-                    var films = result.results;
-                    if (films.length != 0) {
-                        appendFilm(films,flagFilm);
-                    } else {
-                        $(".results.film").text("Film o Serie non trovato!")
+                    var films = result.results; //Prendo array risultati ricevuti da API
+                    if (films.length != 0) { //Se non è vuoto..
+                        appendFilm(films,flagFilm); //Appendo film/serie a html
+                    } else { //Altrimenti..
+                        $(".results.film").text("Film o Serie non trovato!"); //stampo un messaggio
                     }
-
                 },
                 'error' : function() { //Caso di errore di caricamento
                     alert("Errore");
@@ -67,7 +68,11 @@ $(document).ready(function() {
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = false; //Flag che segnala che si stanno cercando serie tv
                     var series = result.results;
-                    appendFilm(series,flagFilm);
+                    if (series.length != 0) { //Se non è vuoto..
+                        appendFilm(series,flagFilm); //Appendo film/serie a html
+                    } else { //Altrimenti..
+                        $(".results.film").text("Film o Serie non trovato!"); //stampo un messaggio
+                    }
                 },
                 'error' : function() { //Caso di errore di caricamento
                     alert("Errore");
@@ -78,40 +83,53 @@ $(document).ready(function() {
 
     function appendFilm(filmArr,flagF) { //Funzione che stampa film trovati
         for (var i = 0; i < filmArr.length; i++) { //Scorro tutti i film trovati con la ricerca
+            var fPoster = getPoster(filmArr[i].poster_path);
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
-            var langFlag = setFlags(filmArr[i].original_language);
-            var printAndPos = objTemplate(filmArr[i],starsVote,flagF,langFlag); //Chiamo funzione per scrivere template film
+            var langFlag = setFlags(filmArr[i].original_language); //Richiamo funione per ricevere bandiera
+            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
         }
     }
 
-    function objTemplate(actFilm,stampVote,flagFS,lang) { //Funzione che prepara template film
-        var infoAndPosition = [];
+    function objTemplate(poster,actFilm,stampVote,flagFS,lang) { //Funzione che prepara template film
+        var infoAndPosition = []; //Array che conterrà tutte le info di un film/serie e distigue se è un film o una serie
         if (flagFS == true) {
             var print = { //Oggetto per prendere variabili Handlebars
+                boolPoster :  poster, //Stampo poster
                 boolTitle : actFilm.title, //recupero titolo
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
             var filmPosition = $(".results.film"); //salvo la posizione dove dovranno essere inseriti i film
-            infoAndPosition.push(print,filmPosition);
+            infoAndPosition.push(print,filmPosition); //Metto info e se film/serie su un array
         } else {
             var print = { //Oggetto per prendere variabili Handlebars
+                boolPoster : poster, //Stampo poster
                 boolTitle : actFilm.name, //recupero titolo
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
             var seriePosition = $(".results.series"); //salvo la posizione dove dovranno essere inserite le serie
-            infoAndPosition.push(print,seriePosition);
+            infoAndPosition.push(print,seriePosition); //Metto info e se film/serie su un array
         }
-        return infoAndPosition
+        return infoAndPosition //ritorno array
     }
 
     function printHtml(templateP,position) { //Funzione he stampa su html
         var printHtml = template(templateP); //Metto in una variabile il template creato con la funzione handlebars
         position.append(printHtml); //Appendo template nel container delle serie o dei film
+    }
+
+    function getPoster(poster) { //Funzione che prende poster
+        var finalPoster = '<img src="' + posterUrl + poster + '">';
+        var notAvaible = '<img src="' + posterNotAvaible + '">';
+        if (!finalPoster.includes("null")) {
+            return finalPoster;
+        } else {
+            return notAvaible;
+        }
     }
 
     function voteToStars(vote) { //Funzione che restituisce il voto in stelle
