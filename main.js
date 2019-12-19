@@ -11,7 +11,7 @@ $(document).ready(function() {
     var flagVoted = 4; //Verifico se si tratta di votati
 
     var posterUrl = 'https://image.tmdb.org/t/p/w342' //Sezione dove recupero poster
-    var posterNotAvaible = 'https://uhcl-ir.tdl.org/bitstream/handle/10657.1/1588/not-available.jpg.jpg.jpg?sequence=3&isAllowed=y'; //Immagine in caso di poster mancante
+    var posterNotAvaible = 'https://upload.wikimedia.org/wikipedia/commons/6/64/Poster_not_available.jpg'; //Immagine in caso di poster mancante
 
     var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','cn','tl','id','ko','vi','hi']; //Lista bandiere
 
@@ -100,7 +100,7 @@ $(document).ready(function() {
         }
     }
 
-    function discoverFilms(sort,flag) {
+    function discoverFilms(sort,flag) { //Funzione che recupera film più votati e famosi
         $.ajax ({ //Chiamata AJAX per recuperare dati film
             'url' : standardUrl + hotNowFilm, //Url per recuperare film
             'method' : 'GET', //Metodo GET
@@ -111,9 +111,8 @@ $(document).ready(function() {
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var hotNow = result.results; //Prendo array risultati ricevuti da API
-                hotNow = hotNow.slice(9, 19);
+                hotNow = hotNow.slice(0, 6);
 
-                console.log(hotNow);
                 appendFilm(hotNow,flag); //Appendo film/serie a html
             },
             'error' : function() { //Caso di errore di caricamento
@@ -127,12 +126,13 @@ $(document).ready(function() {
             var fPoster = getPoster(filmArr[i].poster_path);
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
             var langFlag = setFlags(filmArr[i].original_language); //Richiamo funione per ricevere bandiera
-            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag); //Chiamo funzione per scrivere template film
+            var fOverview = filmOverview(filmArr[i].overview); //Funzione che verifica se è presente l'overview
+            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
         }
     }
 
-    function objTemplate(poster,actFilm,stampVote,flagFS,lang) { //Funzione che prepara template film
+    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview) { //Funzione che prepara template film
         var infoAndPosition = []; //Array che conterrà tutte le info di un film/serie e distigue se è un film o una serie
         if (flagFS != 2) {
             var print = { //Oggetto per prendere variabili Handlebars
@@ -140,9 +140,9 @@ $(document).ready(function() {
                 boolTitle : actFilm.title, //recupero titolo
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
-                boolVote : stampVote //Voto in stelle
+                boolVote : stampVote, //Voto in stelle
+                boolOverview : overview //Trama film
             }
-            console.log(flagFS);
             if (flagFS == 1) {
                 var filmPosition = $("#once-searched .film .results"); //salvo la posizione dove dovranno essere inseriti i film
             } else if (flagFS == 3) {
@@ -157,7 +157,8 @@ $(document).ready(function() {
                 boolTitle : actFilm.name, //recupero titolo
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
-                boolVote : stampVote //Voto in stelle
+                boolVote : stampVote, //Voto in stelle
+                boolOverview : overview //Trama serie
             }
             var seriePosition = $("#once-searched .series .results"); //salvo la posizione dove dovranno essere inserite le serie
             infoAndPosition.push(print,seriePosition); //Metto info e se film/serie su un array
@@ -212,6 +213,16 @@ $(document).ready(function() {
             var retFlag = flagReq;
         }
         return retFlag;
+    }
+
+    function filmOverview(verOver) { //funzione per Verificare se la trama è presente
+        if (verOver.length == 0) { //Se la stringa è vuota..
+            var overRet = "Trama non disponibile." //Stampo questo
+        } else { //Altrimenti
+            var overRet = verOver; //Prendo trama
+        }
+
+        return overRet; //Ritorno valore
     }
 
     function hideShow(x,y) {
