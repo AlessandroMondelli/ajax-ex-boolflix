@@ -76,8 +76,8 @@ main {
     overflow-y: auto;
 }
 
-#hot-now, #once-searched, .results {
-    width: 80%;
+#hot-now, #once-searched {
+    width: 98%;
     margin: auto;
 }
 
@@ -91,18 +91,45 @@ main {
 
 .results {
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     margin-top: 15px;
+    overflow-x: auto;
 }
 
 .card {
     margin-top: 20px;
-    width: 300px;
+    margin-right: 15px;
     border: 1px solid black;
+    position: relative;
+    cursor: pointer;
 }
 
-.poster img {
-    width: 30%;
+.poster {
+    height: 250px;
+    max-width: 100%;
+}
+
+.card .poster img {
+    max-height: 100%;
+}
+
+.card .info {
+    color: white;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    opacity: 0;
+    transition: 0.2s;
+}
+
+.card .language img {
+    vertical-align: middle;
+}
+
+.card:hover .info {
+    background-color: rgba(0, 0, 0, 0.8);
+    opacity: 1;
 }
 
 .fas.fa-star {

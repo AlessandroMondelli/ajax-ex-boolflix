@@ -10,10 +10,10 @@ $(document).ready(function() {
     var mostVoted = 'vote_average.desc'; //Proprietà dell'API che ritorna ilm più Votati
     var flagVoted = 4; //Verifico se si tratta di votati
 
-    var posterUrl = 'https://image.tmdb.org/t/p/w185' //Sezione dove recupero poster
+    var posterUrl = 'https://image.tmdb.org/t/p/w342' //Sezione dove recupero poster
     var posterNotAvaible = 'https://uhcl-ir.tdl.org/bitstream/handle/10657.1/1588/not-available.jpg.jpg.jpg?sequence=3&isAllowed=y'; //Immagine in caso di poster mancante
 
-    var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','ko','vi','hi']; //Lista bandiere
+    var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','cn','tl','id','ko','vi','hi']; //Lista bandiere
 
     //Preparo template Handlebars
     var source = $("#boolflix-template").html();
