@@ -111,7 +111,7 @@ $(document).ready(function() {
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var hotNow = result.results; //Prendo array risultati ricevuti da API
-                hotNow = hotNow.slice(0, 6);
+                hotNow = hotNow.slice(0, 6); //Prendo i primi 7 risultati
 
                 appendFilm(hotNow,flag); //Appendo film/serie a html
             },
@@ -127,6 +127,7 @@ $(document).ready(function() {
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
             var langFlag = setFlags(filmArr[i].original_language); //Richiamo funione per ricevere bandiera
             var fOverview = filmOverview(filmArr[i].overview); //Funzione che verifica se è presente l'overview
+            getCast(filmArr[i].id)
             var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
         }
@@ -179,6 +180,44 @@ $(document).ready(function() {
         } else {
             return notAvaible;
         }
+    }
+
+    function getCast(data) { //Funzione per recuperare attori
+        var credits = 'movie/ ' + data + '/credits' //Sezione dove recupero Crediti film
+        $.ajax ({ //Chiamata AJAX per recuperare dati film
+            'url' : standardUrl + credits, //Url per recuperare film
+            'method' : 'GET', //Metodo GET
+            'data' : { //Informazioni extra per accedere alla sezione
+                'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
+                'movie_id' : data,
+                'language' : 'it-IT'
+            },
+            'success' : function(result) { //Caso funzionamento richiesta
+                var actors = result.cast; //Prendo array risultati ricevuti da API
+                if (actors.length == 0) {
+                    actors = "Cast non disponibile"
+                } else {
+                    actors = actors.slice(0, 4); //Prendo i primi 5 risultati
+                    var allActors = [];
+                    var allCharacter = [];
+                    for (var i = 0; i < actors.length; i++) {
+                        if (actors[i].character.length > 0) {
+                            console.log(actors[i].character);
+                            allCharacter.push(actors[i].character);
+                        }
+                        if (actors[i].name.length > 0) {
+                            console.log(actors[i].name);
+                            allActors.push(actors[i].name);
+                        }
+                    }
+                    console.log([allActors,allCharacter]);
+                    return [allActors,allCharacter];
+                }
+            },
+            'error' : function() { //Caso di errore di caricamento
+                console.log("Errore");
+            }
+        });
     }
 
     function voteToStars(vote) { //Funzione che restituisce il voto in stelle
