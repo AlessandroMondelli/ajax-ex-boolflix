@@ -72,31 +72,28 @@ header {
 
 /*** MAIN ***/
 main {
-    height: calc(100vh - 70px);
+    height: calc(100vh - 71px);
+    overflow-y: auto;
 }
 
-#hot-now {
-    margin-top: 20px;
+#hot-now, #once-searched, .results {
+    width: 80%;
+    margin: auto;
 }
 
-#hot-now.hidden {
-    display: hidden;
+#hot-now .sec h2, #once-searched .sec h2 {
+    margin-top: 30px;
 }
 
 #once-searched {
-    margin-top: 20px;
     display: none;
 }
 
 .results {
-    width: 80%;
-    margin: 0 auto;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-around;
     margin-top: 15px;
 }
-
 
 .card {
     margin-top: 20px;

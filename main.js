@@ -1,15 +1,27 @@
 $(document).ready(function() {
     var standardUrl = 'https://api.themoviedb.org/3/'; //Url standard da dove recupero API
+
     var filmUrl = 'search/movie/'; //Sezione dove recupero film
     var serieUrl = 'search/tv'; //Sezione dove recupero serie tv
+    var hotNowFilm = 'discover/movie'; //Sezione che prende film in base ad un criterio
+
+    var mostPopular = 'popularity.desc'; //Proprietà dell'API che ritorna ilm più popolari
+    var flagPopular = 3; //Verifico se si tratta di popolari
+    var mostVoted = 'vote_average.desc'; //Proprietà dell'API che ritorna ilm più Votati
+    var flagVoted = 4; //Verifico se si tratta di votati
+
     var posterUrl = 'https://image.tmdb.org/t/p/w185' //Sezione dove recupero poster
     var posterNotAvaible = 'https://uhcl-ir.tdl.org/bitstream/handle/10657.1/1588/not-available.jpg.jpg.jpg?sequence=3&isAllowed=y'; //Immagine in caso di poster mancante
+
     var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','ko','vi','hi']; //Lista bandiere
 
     //Preparo template Handlebars
     var source = $("#boolflix-template").html();
     //Preparo template con funzione
     var template = Handlebars.compile(source);
+
+    discoverFilms(mostPopular,flagPopular);
+    discoverFilms(mostVoted,flagVoted);
 
     $(".button").click(function() { //Al click su bottone ricerca
         apiActive(); //Richiamo funzione che attiva tutta la ricerca
@@ -21,7 +33,7 @@ $(document).ready(function() {
         }
     });
 
-    // $( ".research input" )
+
 
 
                         //*** FUNZIONI ***//
@@ -30,7 +42,7 @@ $(document).ready(function() {
         var searchedPos = $("#once-searched"); //Posizone sezione searched
         var ricerca = $(".research input").val(); //Prendo stringa inserita dall'utente
         if (ricerca != "") {
-            $(".results").empty(); //Elimino risultati precedenti
+            $(".results.search").empty(); //Elimino risultati precedenti
             hideShow(hotNowPos,searchedPos); //Cambio stato in base alla ricerca
         } else {
             hideShow(searchedPos,hotNowPos); //Cambio stato se l'utente cerca una stringa vuota
@@ -51,7 +63,7 @@ $(document).ready(function() {
                     'language' : 'it-IT'
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
-                    var flagFilm = true; //Flag che segnala che si stanno cercando dei film
+                    var flagFilm = 1; //Flag che segnala che si stanno cercando dei film
                     var films = result.results; //Prendo array risultati ricevuti da API
                     if (films.length != 0) { //Se non è vuoto..
                         appendFilm(films,flagFilm); //Appendo film/serie a html
@@ -73,7 +85,7 @@ $(document).ready(function() {
                     'language' : 'it-IT'
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
-                    var flagFilm = false; //Flag che segnala che si stanno cercando serie tv
+                    var flagFilm = 2; //Flag che segnala che si stanno cercando serie tv
                     var series = result.results;
                     if (series.length != 0) { //Se non è vuoto..
                         appendFilm(series,flagFilm); //Appendo film/serie a html
@@ -88,6 +100,28 @@ $(document).ready(function() {
         }
     }
 
+    function discoverFilms(sort,flag) {
+        $.ajax ({ //Chiamata AJAX per recuperare dati film
+            'url' : standardUrl + hotNowFilm, //Url per recuperare film
+            'method' : 'GET', //Metodo GET
+            'data' : { //Informazioni extra per accedere alla sezione
+                'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
+                'sort_by' : sort,
+                'language' : 'it-IT'
+            },
+            'success' : function(result) { //Caso funzionamento richiesta
+                var hotNow = result.results; //Prendo array risultati ricevuti da API
+                hotNow = hotNow.slice(9, 19);
+
+                console.log(hotNow);
+                appendFilm(hotNow,flag); //Appendo film/serie a html
+            },
+            'error' : function() { //Caso di errore di caricamento
+                alert("Errore");
+            }
+        });
+    }
+
     function appendFilm(filmArr,flagF) { //Funzione che stampa film trovati
         for (var i = 0; i < filmArr.length; i++) { //Scorro tutti i film trovati con la ricerca
             var fPoster = getPoster(filmArr[i].poster_path);
@@ -100,7 +134,7 @@ $(document).ready(function() {
 
     function objTemplate(poster,actFilm,stampVote,flagFS,lang) { //Funzione che prepara template film
         var infoAndPosition = []; //Array che conterrà tutte le info di un film/serie e distigue se è un film o una serie
-        if (flagFS == true) {
+        if (flagFS != 2) {
             var print = { //Oggetto per prendere variabili Handlebars
                 boolPoster :  poster, //Stampo poster
                 boolTitle : actFilm.title, //recupero titolo
@@ -108,9 +142,16 @@ $(document).ready(function() {
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote //Voto in stelle
             }
-            var filmPosition = $("#once-searched .film .results"); //salvo la posizione dove dovranno essere inseriti i film
+            console.log(flagFS);
+            if (flagFS == 1) {
+                var filmPosition = $("#once-searched .film .results"); //salvo la posizione dove dovranno essere inseriti i film
+            } else if (flagFS == 3) {
+                var filmPosition = $("#hot-now .popular .results.now"); //salvo la posizione dove dovranno essere inseriti i film
+            } else if (flagFS == 4){
+                var filmPosition = $("#hot-now .voted .results.now"); //salvo la posizione dove dovranno essere inseriti i film
+            }
             infoAndPosition.push(print,filmPosition); //Metto info e se film/serie su un array
-        } else {
+        } else if(flagFS == 2) {
             var print = { //Oggetto per prendere variabili Handlebars
                 boolPoster : poster, //Stampo poster
                 boolTitle : actFilm.name, //recupero titolo
