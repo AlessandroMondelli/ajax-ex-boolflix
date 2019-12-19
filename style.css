@@ -77,6 +77,10 @@ main {
     background-color: black;
 }
 
+main.all {
+    height: 100vh;
+}
+
 #hot-now, #once-searched {
     width: 98%;
     margin: auto;

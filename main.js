@@ -20,8 +20,8 @@ $(document).ready(function() {
     //Preparo template con funzione
     var template = Handlebars.compile(source);
 
-    discoverFilms(mostPopular,flagPopular);
-    discoverFilms(mostVoted,flagVoted);
+    discoverFilms(mostPopular,flagPopular); //Cerco film più popolari del momento
+    discoverFilms(mostVoted,flagVoted); //Cerco film più votati
 
     $(".button").click(function() { //Al click su bottone ricerca
         apiActive(); //Richiamo funzione che attiva tutta la ricerca
@@ -68,7 +68,7 @@ $(document).ready(function() {
                     if (films.length != 0) { //Se non è vuoto..
                         appendFilm(films,flagFilm); //Appendo film/serie a html
                     } else { //Altrimenti..
-                        $("#once-searched .film .results").text("Film o Serie non trovato!"); //stampo un messaggio
+                        $("#once-searched .film .results").text("Film non trovato!"); //stampo un messaggio
                     }
                 },
                 'error' : function() { //Caso di errore di caricamento
@@ -90,7 +90,7 @@ $(document).ready(function() {
                     if (series.length != 0) { //Se non è vuoto..
                         appendFilm(series,flagFilm); //Appendo film/serie a html
                     } else { //Altrimenti..
-                        $("#once-searched .series .results").text("Film o Serie non trovato!"); //stampo un messaggio
+                        $("#once-searched .series .results").text("Serie non trovata!"); //stampo un messaggio
                     }
                 },
                 'error' : function() { //Caso di errore di caricamento
@@ -229,4 +229,6 @@ $(document).ready(function() {
         x.hide();
         y.show();
     }
+
+
 });
