@@ -127,13 +127,13 @@ $(document).ready(function() {
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
             var langFlag = setFlags(filmArr[i].original_language); //Richiamo funione per ricevere bandiera
             var fOverview = filmOverview(filmArr[i].overview); //Funzione che verifica se è presente l'overview
-            getCast(filmArr[i].id)
-            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview); //Chiamo funzione per scrivere template film
+            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview,filmArr[i].id); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
+            getCast(filmArr[i].id,flagF); //Funzione che permette di stampare il cast
         }
     }
 
-    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview) { //Funzione che prepara template film
+    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview,idData) { //Funzione che prepara template film
         var infoAndPosition = []; //Array che conterrà tutte le info di un film/serie e distigue se è un film o una serie
         if (flagFS != 2) {
             var print = { //Oggetto per prendere variabili Handlebars
@@ -142,6 +142,7 @@ $(document).ready(function() {
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote, //Voto in stelle
+                boolDataAct : idData, //Data attori
                 boolOverview : overview //Trama film
             }
             if (flagFS == 1) {
@@ -159,6 +160,7 @@ $(document).ready(function() {
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote, //Voto in stelle
+                boolDataAct : idData, //Data attori
                 boolOverview : overview //Trama serie
             }
             var seriePosition = $("#once-searched .series .results"); //salvo la posizione dove dovranno essere inserite le serie
@@ -182,40 +184,41 @@ $(document).ready(function() {
         }
     }
 
-    function getCast(data) { //Funzione per recuperare attori
-        var credits = 'movie/ ' + data + '/credits' //Sezione dove recupero Crediti film
+    function getCast(data,flag) { //Funzione per recuperare attori
+        var creditsFilm = 'movie/ ' + data + '/credits' //Sezione dove recupero Crediti film
+        var creditsSerie = 'tv/' + data + '/credits' //Sezione dove recupero Crediti serie
+
+        if (flag != 2) { //Se non è una serie..
+            var credits = creditsFilm; //Completo url con crediti film
+        } else { //Altrimenti..
+            var credits = creditsSerie; //Completo url con crediti serie
+        }
+
         $.ajax ({ //Chiamata AJAX per recuperare dati film
             'url' : standardUrl + credits, //Url per recuperare film
             'method' : 'GET', //Metodo GET
             'data' : { //Informazioni extra per accedere alla sezione
                 'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
-                'movie_id' : data,
                 'language' : 'it-IT'
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var actors = result.cast; //Prendo array risultati ricevuti da API
-                if (actors.length == 0) {
-                    actors = "Cast non disponibile"
-                } else {
+                if (actors.length == 0) { //Se non ci sono attori salvati nell'API
+                    allActors = "Cast non disponibile"; //Stampo messaggio
+                } else { //Altrimenti...
                     actors = actors.slice(0, 4); //Prendo i primi 5 risultati
-                    var allActors = [];
-                    var allCharacter = [];
-                    for (var i = 0; i < actors.length; i++) {
-                        if (actors[i].character.length > 0) {
-                            console.log(actors[i].character);
-                            allCharacter.push(actors[i].character);
-                        }
-                        if (actors[i].name.length > 0) {
-                            console.log(actors[i].name);
-                            allActors.push(actors[i].name);
+                    var allActors = []; //Preparo array dove inserire gli attori
+                    for (var i = 0; i < actors.length; i++) { //Scorro l'array
+                        if (actors[i].name.length > 0) { //Se il nome dell'attore c'è
+                            allActors.push(actors[i].name); //Inserisco nell'array
                         }
                     }
-                    console.log([allActors,allCharacter]);
-                    return [allActors,allCharacter];
                 }
+                $(".actors[data-actors = '" + data + "']").append(allActors); //Appendo l'array nel film o serie appropriato
             },
             'error' : function() { //Caso di errore di caricamento
                 console.log("Errore");
+                $(".actors[data-actors = '" + data + "']").append("Cast non disponibile"); //Stampo messaggio di cast non trovato in caso di dati mancanti
             }
         });
     }
@@ -268,6 +271,4 @@ $(document).ready(function() {
         x.hide();
         y.show();
     }
-
-
 });
