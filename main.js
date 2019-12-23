@@ -130,6 +130,7 @@ $(document).ready(function() {
             var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview,filmArr[i].id); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
             getCast(filmArr[i].id,flagF); //Funzione che permette di stampare il cast
+            getGen(filmArr[i].genre_ids,filmArr[i].id,flagF) //Funzione che permette di stampare il genere
         }
     }
 
@@ -142,7 +143,7 @@ $(document).ready(function() {
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote, //Voto in stelle
-                boolDataAct : idData, //Data attori
+                boolDataFilm : idData, //Data Film
                 boolOverview : overview //Trama film
             }
             if (flagFS == 1) {
@@ -160,7 +161,7 @@ $(document).ready(function() {
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolVote : stampVote, //Voto in stelle
-                boolDataAct : idData, //Data attori
+                boolDataFilm : idData, //Data Film
                 boolOverview : overview //Trama serie
             }
             var seriePosition = $("#once-searched .series .results"); //salvo la posizione dove dovranno essere inserite le serie
@@ -203,22 +204,67 @@ $(document).ready(function() {
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var actors = result.cast; //Prendo array risultati ricevuti da API
+                var allActors = []; //Preparo array dove inserire gli attori
+
                 if (actors.length == 0) { //Se non ci sono attori salvati nell'API
-                    allActors = "Cast non disponibile"; //Stampo messaggio
+                    var printActors = "Cast non disponibile"; //Stampo messaggio
                 } else { //Altrimenti...
                     actors = actors.slice(0, 4); //Prendo i primi 5 risultati
-                    var allActors = []; //Preparo array dove inserire gli attori
                     for (var i = 0; i < actors.length; i++) { //Scorro l'array
                         if (actors[i].name.length > 0) { //Se il nome dell'attore c'è
                             allActors.push(actors[i].name); //Inserisco nell'array
+                            var printActors = allActors.join(", "); //Trasformo in una stringa
                         }
                     }
                 }
-                $(".actors[data-actors = '" + data + "']").append(allActors); //Appendo l'array nel film o serie appropriato
+                appendElements($(".actors[data-film = '" + data + "']"),printActors); //Richiamo funzione per appendere elementi
             },
             'error' : function() { //Caso di errore di caricamento
                 console.log("Errore");
-                $(".actors[data-actors = '" + data + "']").append("Cast non disponibile"); //Stampo messaggio di cast non trovato in caso di dati mancanti
+                var printActors = "Cast non disponibile";
+                appendElements($(".actors[data-film = '" + data + "']"),printActors); //Stampo messaggio
+            }
+        });
+    }
+
+    function getGen(data,filmId,flag) {
+        genreFilm = "genre/movie/list";
+        genreSerie = "genre/tv/list";
+
+        if (flag != 2) { //Se non è una serie..
+            var genreType = genreFilm; //Completo url con crediti film
+        } else { //Altrimenti..
+            var genreType = genreSerie; //Completo url con crediti serie
+        }
+
+        $.ajax ({ //Chiamata AJAX per recuperare dati film
+            'url' : standardUrl + genreType, //Url per recuperare film
+            'method' : 'GET', //Metodo GET
+            'data' : { //Informazioni extra per accedere alla sezione
+                'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
+                'language' : 'it-IT'
+            },
+            'success' : function(result) { //Caso funzionamento richiesta
+                var genres = result.genres; //Prendo array risultati ricevuti da API
+                var genArray = [] //Unisco generi del singolo film o serie
+
+                for (var i = 0; i < genres.length; i++) { //Scorro tutti i generi
+                    if (data.includes(genres[i].id)) { //Se gli id corrispondono
+                        genArray.push(genres[i].name); //Inserisco genere nell'array
+                        var printGen = genArray.join(", "); //Trasformo in una stringa
+                    }
+                }
+
+                if (genArray.length == 0) { //Se l'array è vuoto
+                    var printGen = "Genere non disponibile"; //Stampo messaggio
+                }
+
+                appendElements($(".genres[data-film= '" + filmId + "']"),printGen) //Richiamo funzione per appendere elementi
+            },
+            'error' : function() { //Caso di errore di caricamento
+                console.log("Errore");
+                var printGen = "Genere non disponibile";
+                appendElements($(".genres[data-film= '" + filmId + "']"),printGen) //Richiamo funzione per appendere elementi
             }
         });
     }
@@ -270,5 +316,9 @@ $(document).ready(function() {
     function hideShow(x,y) {
         x.hide();
         y.show();
+    }
+
+    function appendElements(position,el) { //Funzione che appende elementi
+        position.append(el);
     }
 });
