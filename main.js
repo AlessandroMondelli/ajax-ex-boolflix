@@ -33,7 +33,18 @@ $(document).ready(function() {
         }
     });
 
+    genSelGenres(); //Funzione che genera la lista di generi di film e serie
+    $('.sel-film').change(function() { //Al cambio di genere elezionato dall'utente
+        var sel = $(".sel-film").val(); //Prendo id del genere selezionato
+        var fPos = $(".sec.film .results .genres"); //Posizione dove andrà a lavorare
+        genFilter(sel,fPos); //Richiamo funzione che filtra i film
+    });
 
+    $('.sel-serie').change(function() { //Al cambio di genere elezionato dall'utente
+        var sel = $(".sel-serie").val(); //Prendo id del genere selezionato
+        var sPos = $(".sec.series .results .genres")
+        genFilter(sel,sPos); //Richiamo funzione che filtra i film
+    });
 
 
                         //*** FUNZIONI ***//
@@ -66,7 +77,7 @@ $(document).ready(function() {
                     var flagFilm = 1; //Flag che segnala che si stanno cercando dei film
                     var films = result.results; //Prendo array risultati ricevuti da API
                     if (films.length != 0) { //Se non è vuoto..
-                        appendFilm(films,flagFilm); //Appendo film/serie a html
+                        getDataFilms(films,flagFilm); //Appendo film/serie a html
                     } else { //Altrimenti..
                         $("#once-searched .film .results").text("Film non trovato!"); //stampo un messaggio
                     }
@@ -88,7 +99,7 @@ $(document).ready(function() {
                     var flagFilm = 2; //Flag che segnala che si stanno cercando serie tv
                     var series = result.results;
                     if (series.length != 0) { //Se non è vuoto..
-                        appendFilm(series,flagFilm); //Appendo film/serie a html
+                        getDataFilms(series,flagFilm); //Appendo film/serie a html
                     } else { //Altrimenti..
                         $("#once-searched .series .results").text("Serie non trovata!"); //stampo un messaggio
                     }
@@ -113,7 +124,7 @@ $(document).ready(function() {
                 var hotNow = result.results; //Prendo array risultati ricevuti da API
                 hotNow = hotNow.slice(0, 6); //Prendo i primi 7 risultati
 
-                appendFilm(hotNow,flag); //Appendo film/serie a html
+                getDataFilms(hotNow,flag); //Appendo film/serie a html
             },
             'error' : function() { //Caso di errore di caricamento
                 alert("Errore");
@@ -121,20 +132,20 @@ $(document).ready(function() {
         });
     }
 
-    function appendFilm(filmArr,flagF) { //Funzione che stampa film trovati
+    function getDataFilms(filmArr,flagF) { //Funzione che stampa film trovati
         for (var i = 0; i < filmArr.length; i++) { //Scorro tutti i film trovati con la ricerca
             var fPoster = getPoster(filmArr[i].poster_path);
             var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
             var langFlag = setFlags(filmArr[i].original_language); //Richiamo funione per ricevere bandiera
             var fOverview = filmOverview(filmArr[i].overview); //Funzione che verifica se è presente l'overview
-            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview,filmArr[i].id); //Chiamo funzione per scrivere template film
+            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview,filmArr[i].id,filmArr[i].genre_ids); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
             getCast(filmArr[i].id,flagF); //Funzione che permette di stampare il cast
             getGen(filmArr[i].genre_ids,filmArr[i].id,flagF) //Funzione che permette di stampare il genere
         }
     }
 
-    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview,idData) { //Funzione che prepara template film
+    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview,idData,idGen) { //Funzione che prepara template film
         var infoAndPosition = []; //Array che conterrà tutte le info di un film/serie e distigue se è un film o una serie
         if (flagFS != 2) {
             var print = { //Oggetto per prendere variabili Handlebars
@@ -142,6 +153,7 @@ $(document).ready(function() {
                 boolTitle : actFilm.title, //recupero titolo
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
+                boolDataGen : idGen, //Id genere
                 boolVote : stampVote, //Voto in stelle
                 boolDataFilm : idData, //Data Film
                 boolOverview : overview //Trama film
@@ -160,6 +172,7 @@ $(document).ready(function() {
                 boolTitle : actFilm.name, //recupero titolo
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
+                boolDataGen : idGen, //Id genere
                 boolVote : stampVote, //Voto in stelle
                 boolDataFilm : idData, //Data Film
                 boolOverview : overview //Trama serie
@@ -246,25 +259,102 @@ $(document).ready(function() {
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var genres = result.genres; //Prendo array risultati ricevuti da API
-                var genArray = [] //Unisco generi del singolo film o serie
 
-                for (var i = 0; i < genres.length; i++) { //Scorro tutti i generi
-                    if (data.includes(genres[i].id)) { //Se gli id corrispondono
-                        genArray.push(genres[i].name); //Inserisco genere nell'array
-                        var printGen = genArray.join(", "); //Trasformo in una stringa
-                    }
-                }
-
-                if (genArray.length == 0) { //Se l'array è vuoto
-                    var printGen = "Genere non disponibile"; //Stampo messaggio
-                }
-
-                appendElements($(".genres[data-film= '" + filmId + "']"),printGen) //Richiamo funzione per appendere elementi
+                appendGenres(genres,data,filmId); //Richiamo funzione per appendere generi
             },
             'error' : function() { //Caso di errore di caricamento
                 console.log("Errore");
                 var printGen = "Genere non disponibile";
                 appendElements($(".genres[data-film= '" + filmId + "']"),printGen) //Richiamo funzione per appendere elementi
+            }
+        });
+    }
+
+    function appendGenres(allGenres,dataF,id) {
+        var genArray = [] //Array per unire generi del singolo film o serie
+
+        for (var i = 0; i < allGenres.length; i++) { //Scorro tutti i generi
+            if (dataF.includes(allGenres[i].id)) { //Se gli id corrispondono
+                genArray.push(allGenres[i].name); //Inserisco genere nell'array
+                var printGen = genArray.join(", "); //Trasformo in una stringa
+            }
+        }
+
+        if (genArray.length == 0) { //Se l'array è vuoto
+            var printGen = "Genere non disponibile"; //Stampo messaggio
+        }
+
+        appendElements($(".genres[data-film= '" + id + "']"),printGen) //Richiamo funzione per appendere elementi
+    }
+
+    function genSelGenres() { //Funzione che stampa tutte le opzioni di generi
+        genreFilm = "genre/movie/list";
+        genreSerie = "genre/tv/list";
+
+        $.ajax ({ //Chiamata AJAX per recuperare dati generi film
+            'url' : standardUrl + genreFilm, //Url per recuperare film
+            'method' : 'GET', //Metodo GET
+            'data' : { //Informazioni extra per accedere alla sezione
+                'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
+                'language' : 'it-IT'
+            },
+            'success' : function(result) { //Caso funzionamento richiesta
+                var genres = result.genres; //Prendo array risultati ricevuti da API
+
+                for (var j = 0; j < genres.length; j++) { //Scsorro risultati
+                    var option = "<option value=" + genres[j].id + ">" + genres[j].name + "</option>"; //Creo codice html opzioni generi film
+
+                    appendElements($("#once-searched .sel-film"),option); //appendo generi
+                }
+            },
+            'error' : function() { //Caso di errore di caricamento
+                console.log("Errore");
+            }
+        });
+
+        $.ajax ({ //Chiamata AJAX per recuperare dati generi serie
+            'url' : standardUrl + genreSerie, //Url per recuperare film
+            'method' : 'GET', //Metodo GET
+            'data' : { //Informazioni extra per accedere alla sezione
+                'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
+                'language' : 'it-IT'
+            },
+            'success' : function(result) { //Caso funzionamento richiesta
+                var genres = result.genres; //Prendo array risultati ricevuti da API
+
+                for (var j = 0; j < genres.length; j++) {
+                    var option = "<option value=" + genres[j].id + ">" + genres[j].name + "</option>"; //Creo codice html opzioni generi serie tv
+
+                    appendElements($("#once-searched .sel-serie"),option); //Appendo generi
+                }
+            },
+            'error' : function() { //Caso di errore di caricamento
+                console.log("Errore");
+            }
+        });
+    }
+
+    function genFilter(genSel,pos) { //Funzione che filtra i film in base al genere
+        pos.each(function() { //Scorro tutti i generi di ogni card
+            var dataGenFilm = $(this).data('gen'); //Id genere del film
+            var cardVal = $(this).closest(".card"); //Valore intera carda da nascondere o mostrare
+            if (dataGenFilm.length > 1) { //Se ci sono più generi in una singola card
+                dataGenFilm = dataGenFilm.split(","); //Elimino virgole tra gli id
+                if (dataGenFilm.includes(genSel)) { //Se almeno un genere corrisponde..
+                    cardVal.show(); //Mostra card
+                } else if (genSel == "sel") { //Se si clicca su seleziona genere..
+                    cardVal.show(); //Mostra tutte le card
+                } else { //Se non corrispondono..
+                    cardVal.hide(); //Nascondi card
+                }
+            } else { //Se ha un solo genere..
+                if (dataGenFilm == genSel) { //Se corrisponde
+                    cardVal.show(); //Mostra card
+                } else if (genSel == "sel") { //Se si clicca su seleziona genere..
+                    cardVal.show(); //Mostra tutte le card
+                } else { //Se non corrispondono..
+                    cardVal.hide(); //Nascondi card
+                }
             }
         });
     }

@@ -102,7 +102,7 @@ main.all {
 .results {
     display: flex;
     justify-content: flex-start;
-    margin-top: 15px;
+    margin-top: 13px;
     overflow-x: auto;
     color: white;
 }
@@ -121,6 +121,18 @@ main.all {
 
 #once-searched .poster {
     height: 325px;
+}
+
+#once-searched h2 {
+    display: inline-block;
+}
+
+#once-searched select {
+    display: inline-block;
+    margin-left: 20px;
+    background-color: black;
+    color: white;
+    height: 30px;
 }
 
 

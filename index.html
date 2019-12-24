@@ -41,10 +41,16 @@
             <div id="once-searched">
                 <div class="sec film">
                     <h2>Film</h2>
+                    <select class="sel-gen sel-film">
+                        <option value="sel">Seleziona un genere</option>
+                    </select>
                     <div class="results search"></div>
                 </div>
                 <div class="sec series">
                     <h2>Serie Tv</h2>
+                    <select class="sel-gen sel-serie">
+                        <option value="sel">Seleziona un genere</option>
+                    </select>
                     <div class="results search"></div>
                 </div>
             </div>
@@ -57,7 +63,7 @@
                         <h3 class="title">{{ boolTitle }}</h2>
                         <p class="original-title"><strong>Titolo originale:</strong> {{ boolOrTitle }}</p>
                         <p class="language"><strong>Lingua:</strong> {{{ boolLang }}}</p>
-                        <p class="genres" data-film="{{ boolDataFilm }}"><strong>Genere: </strong> {{ boolGen }}</p>
+                        <p class="genres" data-film="{{ boolDataFilm }}" data-gen="{{ boolDataGen }}"><strong>Genere: </strong> {{ boolGen }}</p>
                         <p class="vote"><strong>Voto:</strong> {{{ boolVote }}}</p>
                         <p class="actors" data-film="{{ boolDataFilm }}"><strong>Cast: </strong></p>
                         <p class="overview"><strong>Trama: </strong> {{{ boolOverview }}}</p>
