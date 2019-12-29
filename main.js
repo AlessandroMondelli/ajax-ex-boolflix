@@ -46,6 +46,12 @@ $(document).ready(function() {
         genFilter(sel,sPos); //Richiamo funzione che filtra i film
     });
 
+    selVoteGen();
+    $('.vot-film').change(function() { //Al cambio di genere elezionato dall'utente
+        var votSel = $(".vot-film").val(); //Prendo id del genere selezionato
+        voteFilter(votSel); //Richiamo funzione che filtra i film
+    });
+
 
                         //*** FUNZIONI ***//
     function getSearch() { //Funzione che prende valore dell'input
@@ -364,6 +370,7 @@ $(document).ready(function() {
         var retVote; //Variabile che conterrà il contenuto da mandare a schermo
 
         vote5 = Math.ceil((vote / 2)); //Arrontondo voto in base 5
+        voteFilter(vote5);
         retVote = forStars(vote5); //Richiamo funzona per trasformare voto in stelle
 
         return retVote; //Ritorno codice con stelle
@@ -382,6 +389,17 @@ $(document).ready(function() {
             }
         }
         return finalVote; //Ritorno codice finale
+    }
+
+    function selVoteGen() {
+        for (var i = 0; i <= 5; i++) {
+            var genCode = '<option value="' + i + '">' + i + '</option>';
+            $('.sel-vot').append(genCode);
+        }
+    }
+
+    function voteFilter(vote) {
+
     }
 
     function setFlags(flagReq) { //Funzione che setta
