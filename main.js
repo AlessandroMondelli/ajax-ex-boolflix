@@ -37,20 +37,31 @@ $(document).ready(function() {
     $('.sel-film').change(function() { //Al cambio di genere elezionato dall'utente
         var sel = $(".sel-film").val(); //Prendo id del genere selezionato
         var fPos = $(".sec.film .results .genres"); //Posizione dove andrà a lavorare
+        resetVoteFilter(); //Richiamo funzione che resetta filtro voti
         genFilter(sel,fPos); //Richiamo funzione che filtra i film
     });
 
     $('.sel-serie').change(function() { //Al cambio di genere elezionato dall'utente
         var sel = $(".sel-serie").val(); //Prendo id del genere selezionato
         var sPos = $(".sec.series .results .genres")
+        resetVoteFilter(); //Richiamo funzione che resetta filtro voti
         genFilter(sel,sPos); //Richiamo funzione che filtra i film
     });
 
-    selVoteGen();
+    selVoteGen(); //Richiamo funzione che genera select con voti
     $('.vot-film').change(function() { //Al cambio di genere elezionato dall'utente
         var votSel = $(".vot-film").val(); //Prendo id del genere selezionato
-        voteFilter(votSel); //Richiamo funzione che filtra i film
+        var fVPos = $(".sec.film .results .card .vote"); //Posizione dove andrà a lavorare
+        voteFilter(votSel,fVPos); //Richiamo funzione che filtra i film
     });
+
+    $('.vot-serie').change(function() { //Al cambio di genere elezionato dall'utente
+        var votSel = $(".vot-serie").val(); //Prendo id del genere selezionato
+        var fVPos = $(".sec.series .results .card .vote"); //Posizione dove andrà a lavorare
+        voteFilter(votSel,fVPos); //Richiamo funzione che filtra i film
+    });
+
+
 
 
                         //*** FUNZIONI ***//
@@ -140,18 +151,19 @@ $(document).ready(function() {
 
     function getDataFilms(filmArr,flagF) { //Funzione che stampa film trovati
         for (var i = 0; i < filmArr.length; i++) { //Scorro tutti i film trovati con la ricerca
-            var fPoster = getPoster(filmArr[i].poster_path);
-            var starsVote = voteToStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
+            var fPoster = getPoster(filmArr[i].poster_path); //Richiamo funzione per prendere poster
+            var starsVote = forStars(filmArr[i].vote_average); //Richiamo funzione per trasformare voto in stelle
+            var dataVote = voteTo5(filmArr[i].vote_average); //Prendo base5 del voto da mettere nel data-vote
             var langFlag = setFlags(filmArr[i].original_language); //Richiamo funione per ricevere bandiera
             var fOverview = filmOverview(filmArr[i].overview); //Funzione che verifica se è presente l'overview
-            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview,filmArr[i].id,filmArr[i].genre_ids); //Chiamo funzione per scrivere template film
+            var printAndPos = objTemplate(fPoster,filmArr[i],starsVote,flagF,langFlag,fOverview,filmArr[i].id,filmArr[i].genre_ids,dataVote); //Chiamo funzione per scrivere template film
             printHtml(printAndPos[0],printAndPos[1]); //richiamo funzione per appendere film nell'html
             getCast(filmArr[i].id,flagF); //Funzione che permette di stampare il cast
             getGen(filmArr[i].genre_ids,filmArr[i].id,flagF) //Funzione che permette di stampare il genere
         }
     }
 
-    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview,idData,idGen) { //Funzione che prepara template film
+    function objTemplate(poster,actFilm,stampVote,flagFS,lang,overview,idData,idGen,dataVotePrint) { //Funzione che prepara template film
         var infoAndPosition = []; //Array che conterrà tutte le info di un film/serie e distigue se è un film o una serie
         if (flagFS != 2) {
             var print = { //Oggetto per prendere variabili Handlebars
@@ -160,6 +172,7 @@ $(document).ready(function() {
                 boolOrTitle : actFilm.original_title, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolDataGen : idGen, //Id genere
+                boolDataVote : dataVotePrint, //Data vote
                 boolVote : stampVote, //Voto in stelle
                 boolDataFilm : idData, //Data Film
                 boolOverview : overview //Trama film
@@ -179,6 +192,7 @@ $(document).ready(function() {
                 boolOrTitle : actFilm.original_name, //Recupero titolo originale
                 boolLang : lang, //Bandiera lingua
                 boolDataGen : idGen, //Id genere
+                boolDataVote : dataVotePrint, //Data vote
                 boolVote : stampVote, //Voto in stelle
                 boolDataFilm : idData, //Data Film
                 boolOverview : overview //Trama serie
@@ -347,36 +361,32 @@ $(document).ready(function() {
             if (dataGenFilm.length > 1) { //Se ci sono più generi in una singola card
                 dataGenFilm = dataGenFilm.split(","); //Elimino virgole tra gli id
                 if (dataGenFilm.includes(genSel)) { //Se almeno un genere corrisponde..
-                    cardVal.show(); //Mostra card
+                    addRemoveClass(cardVal,"active","no_active");
                 } else if (genSel == "sel") { //Se si clicca su seleziona genere..
-                    cardVal.show(); //Mostra tutte le card
+                    addRemoveClass(cardVal,"active","no_active");
                 } else { //Se non corrispondono..
-                    cardVal.hide(); //Nascondi card
+                    addRemoveClass(cardVal,"no_active","active");
                 }
             } else { //Se ha un solo genere..
                 if (dataGenFilm == genSel) { //Se corrisponde
-                    cardVal.show(); //Mostra card
+                    addRemoveClass(cardVal,"active","no_active");
                 } else if (genSel == "sel") { //Se si clicca su seleziona genere..
-                    cardVal.show(); //Mostra tutte le card
+                    addRemoveClass(cardVal,"active","no_active");
                 } else { //Se non corrispondono..
-                    cardVal.hide(); //Nascondi card
+                    addRemoveClass(cardVal,"no_active","active");
                 }
             }
         });
     }
 
-    function voteToStars(vote) { //Funzione che restituisce il voto in stelle
+    function voteTo5(voteTransf) { //Funzione che restituisce il voto base 5
         var vote5; //Voto in base 5
-        var retVote; //Variabile che conterrà il contenuto da mandare a schermo
-
-        vote5 = Math.ceil((vote / 2)); //Arrontondo voto in base 5
-        voteFilter(vote5);
-        retVote = forStars(vote5); //Richiamo funzona per trasformare voto in stelle
-
-        return retVote; //Ritorno codice con stelle
+        vote5 = Math.ceil((voteTransf / 2)); //Arrontondo voto in base 5
+        return vote5; //Ritorno voto in base 5
     }
 
-    function forStars(full) { //Funzione che permette di immettere in una variabile un tot di stelle piene e vuote
+    function forStars(vote) { //Funzione che permette di immettere in una variabile un tot di stelle piene e vuote
+        var full = voteTo5(vote); //Richiamo funzione che traforma voto in base 5
         var fullStar = "<i class=\"fas fa-star\"></i>"; //Codice per stella piena
         var emptyStar = "<i class=\"far fa-star\"></i>" //Codice per stella vuota
         var finalVote = ""; //Codice che ocnterrà tutte le stelle
@@ -391,22 +401,39 @@ $(document).ready(function() {
         return finalVote; //Ritorno codice finale
     }
 
-    function selVoteGen() {
+    function selVoteGen() { //Genro select con voti
         for (var i = 0; i <= 5; i++) {
             var genCode = '<option value="' + i + '">' + i + '</option>';
             $('.sel-vot').append(genCode);
         }
     }
 
-    function voteFilter(vote) {
-
+    function voteFilter(vote,pos) { //Funzione che filtra voti
+        pos.each(function() { //Per ogni card..
+            var dataVoteFilm = $(this).data('vote'); //Id voto del film
+            var cardVal = $(this).closest(".card"); //Valore intera carda da nascondere o mostrare
+            if ((cardVal.hasClass('active') || (cardVal.is(":visible")))) { //Se la card è attiva
+                if (dataVoteFilm == vote) { //Se i voti corrispondono..
+                    addRemoveClass(cardVal,"active_vote","no_active_vote"); //Richiama funzione che permette di aggiungere/rimuovere classe active
+                } else if (vote == 'sel') { //Se viene selezionato "Seleziona voto"..
+                    cardVal.removeClass("active_vote").removeClass("no_active_vote"); //Mostra tutti i risultati visibili prima
+                } else { //Se i voti non corrispondono..
+                    addRemoveClass(cardVal,"no_active_vote","active_vote"); //Richiama funzione che permette di aggiungere/rimuovere classe active
+                }
+            }
+        })
     }
 
-    function setFlags(flagReq) { //Funzione che setta
-        if (flagsAvaible.includes(flagReq)) {
-            var retFlag = '<img src="flags/' + flagReq + '.png" alt="Bandiera ' + flagReq +'">';
+    function resetVoteFilter() { //Funzione che resetta filtro voti
+        $('.vot-film, .vot-serie').prop('selectedIndex',0); //Risetto voto a "sel"
+        $('.card').removeClass('active_vote').removeClass('no_active_vote'); //Rimuovo Filtro voti
+    }
+
+    function setFlags(flagReq) { //Funzione che setta le bandiere
+        if (flagsAvaible.includes(flagReq)) { //Se la bandiera richiesta è presente nell'array delle bandiere disponibili
+            var retFlag = '<img src="flags/' + flagReq + '.png" alt="Bandiera ' + flagReq +'">'; //Aggiungi immagine bandiera
         } else {
-            var retFlag = flagReq;
+            var retFlag = flagReq; //Altrimenti scrivi linguas
         }
         return retFlag;
     }
@@ -421,9 +448,14 @@ $(document).ready(function() {
         return overRet; //Ritorno valore
     }
 
-    function hideShow(x,y) {
+    function hideShow(x,y) { //Funzione che mostra/nasconde
         x.hide();
         y.show();
+    }
+
+    function addRemoveClass(x,selClass,selClass2) { //Funzione che aggiunge rimuove classe
+        x.addClass(selClass).removeClass(selClass2);
+
     }
 
     function appendElements(position,el) { //Funzione che appende elementi

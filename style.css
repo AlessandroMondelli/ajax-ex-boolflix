@@ -115,6 +115,22 @@ main.all {
     cursor: pointer;
 }
 
+.card.active {
+    display: block;
+}
+
+.card.no_active {
+    display: none;
+}
+
+.card.active_vote {
+    display: block;
+}
+
+.card.no_active_vote {
+    display: none;
+}
+
 #hot-now .poster {
     height: 430px;
 }
