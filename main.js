@@ -14,6 +14,7 @@ $(document).ready(function() {
     var posterNotAvaible = 'https://upload.wikimedia.org/wikipedia/commons/6/64/Poster_not_available.jpg'; //Immagine in caso di poster mancante
 
     var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','cn','tl','id','ko','vi','hi']; //Lista bandiere
+    var changeLang = 'It-it'; //Variabile globale per scelta lingua
 
     //Preparo template Handlebars
     var source = $("#boolflix-template").html();
@@ -27,10 +28,23 @@ $(document).ready(function() {
         apiActive(); //Richiamo funzione che attiva tutta la ricerca
     });
 
-    $( ".research input" ).keypress(function(event) { //Alla pressione di invio..
+    $( ".search-menu input" ).keypress(function(event) { //Alla pressione di invio..
         if (event.which == 13) {
-            apiActive(); //Richiamo funzione che attiva tutta la ricercas
+            apiActive(); //Richiamo funzione che attiva tutta la ricerca
         }
+    });
+
+    $(".film-lang").hover(function() { //Effetto hover su lingue
+        $(".other-lang").slideDown();
+    },
+    function() { //quando si esce dall'hover
+        $(".other-lang").slideUp();
+    });
+
+    $(".lang").click(function() {
+        var lang = $(this).data('lang');
+        console.log(this);
+        changeLang =  lang + "-" + lang.toUpperCase();
     });
 
     genSelGenres(); //Funzione che genera la lista di generi di film e serie
@@ -68,14 +82,14 @@ $(document).ready(function() {
     function getSearch() { //Funzione che prende valore dell'input
         var hotNowPos = $("#hot-now"); //Posizione sezione hot now
         var searchedPos = $("#once-searched"); //Posizone sezione searched
-        var ricerca = $(".research input").val(); //Prendo stringa inserita dall'utente
+        var ricerca = $(".search-menu input").val(); //Prendo stringa inserita dall'utente
         if (ricerca != "") {
             $(".results.search").empty(); //Elimino risultati precedenti
             hideShow(hotNowPos,searchedPos); //Cambio stato in base alla ricerca
         } else {
             hideShow(searchedPos,hotNowPos); //Cambio stato se l'utente cerca una stringa vuota
         }
-        $(".research input").val(""); //Elimino testo dopo la ricerca
+        $(".search-menu input").val(""); //Elimino testo dopo la ricerca
         return ricerca; //Ritorno il valore ricercato
     }
 
@@ -88,7 +102,7 @@ $(document).ready(function() {
                 'data' : { //Informazioni extra per accedere alla sezione
                     'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
                     'query' : searchVal,
-                    'language' : 'it-IT'
+                    'language' : changeLang
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = 1; //Flag che segnala che si stanno cercando dei film
@@ -110,7 +124,7 @@ $(document).ready(function() {
                 'data' : { //Informazioni extra per accedere alla sezione
                     'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
                     'query' : searchVal,
-                    'language' : 'it-IT'
+                    'language' : changeLang
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = 2; //Flag che segnala che si stanno cercando serie tv
@@ -135,7 +149,7 @@ $(document).ready(function() {
             'data' : { //Informazioni extra per accedere alla sezione
                 'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
                 'sort_by' : sort,
-                'language' : 'it-IT'
+                'language' : changeLang
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var hotNow = result.results; //Prendo array risultati ricevuti da API
@@ -209,11 +223,11 @@ $(document).ready(function() {
     }
 
     function getPoster(poster) { //Funzione che prende poster
-        var finalPoster = '<img src="' + posterUrl + poster + '">';
-        var notAvaible = '<img src="' + posterNotAvaible + '">';
-        if (!finalPoster.includes("null")) {
+        var finalPoster = '<img src="' + posterUrl + poster + '">'; //Risultato se il poster è presente
+        var notAvaible = '<img src="' + posterNotAvaible + '">'; //Risultato se il poster non è presente
+        if (!finalPoster.includes("null")) { //Se la ricerca non riporta null..
             return finalPoster;
-        } else {
+        } else { //Se la ricerca riporta null..
             return notAvaible;
         }
     }
@@ -233,7 +247,7 @@ $(document).ready(function() {
             'method' : 'GET', //Metodo GET
             'data' : { //Informazioni extra per accedere alla sezione
                 'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
-                'language' : 'it-IT'
+                'language' : changeLang
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var actors = result.cast; //Prendo array risultati ricevuti da API
@@ -337,7 +351,7 @@ $(document).ready(function() {
             'method' : 'GET', //Metodo GET
             'data' : { //Informazioni extra per accedere alla sezione
                 'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
-                'language' : 'it-IT'
+                'language' : changeLang
             },
             'success' : function(result) { //Caso funzionamento richiesta
                 var genres = result.genres; //Prendo array risultati ricevuti da API

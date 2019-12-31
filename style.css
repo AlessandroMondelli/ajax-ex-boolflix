@@ -36,31 +36,71 @@ header {
     float: right;
 }
 
-.research {
+ul {
+    list-style-type: none;
+}
+
+.search-menu img {
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.search-menu .film-lang {
+    text-align: center;
+    position: relative;
+    display: inline-block;
+}
+
+.film-lang.active {
+    display: inline-block;
+}
+
+.other-lang {
+    position: absolute;
+    right: 16px;
+    top: 60px;
+    z-index: 3;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-left: 10px;
+}
+
+.other-lang li {
+    margin-top: -15px;
+    margin-bottom: -10px;
+}
+
+.search-menu .film-lang .lang {
+    margin-right: 15px;
+}
+
+.search-menu .film-lang .lang i {
+    margin-left: 8px;
+}
+
+.search-menu {
     text-align: right;
     color: white;
 }
 
-.research input {
+.search-menu input {
     height: 30px;
     width: 190px;
     margin-right: 10px;
 }
 
-.research input, .button {
+.search-menu input, .button {
     margin-top: 20px;
 }
 
-.research .fa-bell {
+.search-menu .fa-bell {
     margin-right: 20px;
     font-size: 20px;
     cursor: pointer;
 }
 
-.research img {
+.search-menu #user-img{
     width: 8%;
-    vertical-align: middle;
-    cursor: pointer;
 }
 
 .button {
