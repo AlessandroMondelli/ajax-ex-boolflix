@@ -57,7 +57,7 @@ ul {
 
 .other-lang {
     position: absolute;
-    right: 16px;
+    right: 0px;
     top: 60px;
     z-index: 3;
     display: none;

@@ -41,10 +41,15 @@ $(document).ready(function() {
         $(".other-lang").slideUp();
     });
 
-    $(".lang").click(function() {
-        var lang = $(this).data('lang');
-        console.log(this);
-        changeLang =  lang + "-" + lang.toUpperCase();
+    $(".lang img").click(function() {
+        var lang = $(this).data('lang'); //Data che riconosce quale lingua è staa cliccata
+        var temp = $(".lang#first-lan").html();
+        var outerThis = $(this).closest("li");
+        $(".film-lang #first-lan img").remove();
+        $(".film-lang #first-lan").html($(this));
+        outerThis.html(temp);
+
+        changeLang =  lang + "-" + lang.toUpperCase(); //Codice che permette di cambiare lingua
     });
 
     genSelGenres(); //Funzione che genera la lista di generi di film e serie
