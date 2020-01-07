@@ -16,6 +16,11 @@ $(document).ready(function() {
     var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','cn','tl','id','ko','vi','hi']; //Lista bandiere
     var changeLang = 'IT-it'; //Variabile globale per scelta lingua
 
+    var pagValF = 1; //Pagina di default Film
+    var pagValS = 1; //Pagina di default serie
+    var flagRicOrPag = 0; //Flag per ricerca o pagina
+    var oldResearch; //Salvo ricerca appena eseguita
+
     //Preparo template Handlebars
     var source = $("#boolflix-template").html();
     //Preparo template con funzione
@@ -25,20 +30,26 @@ $(document).ready(function() {
     discoverFilms(mostVoted,flagVoted); //Cerco film più votati
 
     $(".button").click(function() { //Al click su bottone ricerca
-        apiActive(); //Richiamo funzione che attiva tutta la ricerca
+        flagRicOrPag = 0; //Setto su nuova ricerca
+        pagValF = 1 //Ricerco prima pagina del risultato Film
+        pagValS = 1 //Ricerco prima pagina del risultato Serie
+        apiActive(flagRicOrPag); //Richiamo funzione che attiva tutta la ricerca
     });
 
     $( ".search-menu input" ).keypress(function(event) { //Alla pressione di invio..
         if (event.which == 13) {
-            apiActive(); //Richiamo funzione che attiva tutta la ricerca
+            flagRicOrPag = 0; //Setto su nuova ricerca
+            pagValF = 1 //Ricerco prima pagina del risultato Film
+            pagValS = 1 //Ricerco prima pagina del risultato Serie
+            apiActive(flagRicOrPag); //Richiamo funzione che attiva tutta la ricerca
         }
     });
 
     $(".film-lang").mouseenter(function() { //Effetto hover su lingue
-        $(".other-lang").slideDown();
+        $(".other-lang").slideDown("slow");
     });
     $(".film-lang").mouseleave(function() { //Effetto hover su lingue
-        $(".other-lang").slideUp();
+        $(".other-lang").slideUp("slow");
     });
 
     $(".other-lang .lang img").click(function() {
@@ -82,6 +93,20 @@ $(document).ready(function() {
         voteFilter(votSel,fVPos); //Richiamo funzione che filtra i film
     });
 
+    $(document).on('click', '.n-pages.p-film .num-pag', function() { //Su click su numero pagina
+        pagValF = parseInt($(this).text()); //Prendo numero della pagina selezionato
+        flagRicOrPag = 1 //Flag per riconoscere che l'api viene richiesta per una nuova pagina e non per una nuova ricerca
+        newPage($(".n-pages.p-film span"),$(this),$("#once-searched .film .results .card")); //Richiamo funzione per mostrare nuova pagina risultati
+        apiActive(flagRicOrPag); //Richiamo funzione che chiama API
+    });
+
+    $(document).on('click', '.n-pages.p-serie .num-pag', function() { //Su click su numero pagina
+        pagValS = parseInt($(this).text()); //Prendo numero della pagina selezionato
+        flagRicOrPag = 2 //Flag per riconoscere che l'api viene richiesta per una nuova pagina e non per una nuova ricerca
+        newPage($(".n-pages.p-serie span"),$(this),$("#once-searched .series .results .card")); //Richiamo funzione per mostrare nuova pagina risultati
+        apiActive(flagRicOrPag); //Richiamo funzione che chiama API
+    });
+
 
 
 
@@ -93,29 +118,38 @@ $(document).ready(function() {
         if (ricerca != "") {
             $(".results.search").empty(); //Elimino risultati precedenti
             hideShow(hotNowPos,searchedPos); //Cambio stato in base alla ricerca
-        } else {
-            hideShow(searchedPos,hotNowPos); //Cambio stato se l'utente cerca una stringa vuota
         }
         $(".search-menu input").val(""); //Elimino testo dopo la ricerca
         return ricerca; //Ritorno il valore ricercato
     }
 
-    function apiActive() { //Funzione per trovare film tramite API
-        var searchVal = getSearch(); //Prendo valore ricerca
-        if (searchVal != "") { //Se la ricerca non è vuota...
+    function apiActive(flagRes) { //Funzione per trovare film tramite API
+        if (flagRes == 0) { //Se viene fatta una nuova ricerca...
+            var searchVal = getSearch(); //Prendo valore ricerca
+            oldResearch = searchVal; // salvo ricerca
+        } else { //Altrimenti..
+            searchVal = oldResearch; //Salvo vecchia ricerca
+        }
+
+        if (searchVal != ""){ //Se la ricerca non è vuota...
             $.ajax ({ //Chiamata AJAX per recuperare dati film
                 'url' : standardUrl + filmUrl, //Url per recuperare film
                 'method' : 'GET', //Metodo GET
                 'data' : { //Informazioni extra per accedere alla sezione
                     'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
                     'query' : searchVal,
-                    'language' : changeLang
+                    'language' : changeLang,
+                    'page' : pagValF
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = 1; //Flag che segnala che si stanno cercando dei film
                     var films = result.results; //Prendo array risultati ricevuti da API
+                    var pages = result.total_pages; //Prendo nmero di pagine totali
                     if (films.length != 0) { //Se non è vuoto..
-                        getDataFilms(films,flagFilm); //Appendo film/serie a html
+                        getDataFilms(films,flagFilm); //Funzione che prende tutti i dati necessari per le varie funzioni
+                        if (flagRes == 0) { //Se è una nuova ricerca..
+                            appendPagesNumbers(pages,flagFilm); //Funzione che genera numero di pagine diponibili
+                        }
                     } else { //Altrimenti..
                         $("#once-searched .film .results").text("Film non trovato!"); //stampo un messaggio
                     }
@@ -131,13 +165,18 @@ $(document).ready(function() {
                 'data' : { //Informazioni extra per accedere alla sezione
                     'api_key' : 'a5c0e4852eb33c487e7bf7b17de279d2',
                     'query' : searchVal,
-                    'language' : changeLang
+                    'language' : changeLang,
+                    'page' : pagValS
                 },
                 'success' : function(result) { //Caso funzionamento richiesta
                     var flagFilm = 2; //Flag che segnala che si stanno cercando serie tv
                     var series = result.results;
+                    var pagesSerie = result.total_pages; //Prendo nmero di pagine totali
                     if (series.length != 0) { //Se non è vuoto..
                         getDataFilms(series,flagFilm); //Appendo film/serie a html
+                        if (flagRes == 0) { //Se è una nuova ricerca..
+                            appendPagesNumbers(pagesSerie,flagFilm); //Funzione che genera numero di pagine diponibili
+                        }
                     } else { //Altrimenti..
                         $("#once-searched .series .results").text("Serie non trovata!"); //stampo un messaggio
                     }
@@ -469,6 +508,37 @@ $(document).ready(function() {
         return overRet; //Ritorno valore
     }
 
+    function appendPagesNumbers(nPages,flagSOrF) { //Funzione che genera numero pagine
+        var numGen; //Variabile che conterrà il codice html da appedere
+        var pos; //Posizione dove andranno messe le pagine
+        var pos1;
+
+        if (flagSOrF == 1) { //Se un film..
+            pos = $(".n-pages.p-film span");
+            pos1 = $(".n-pages.p-film");
+        } else { //Se una serie
+            pos = $(".n-pages.p-serie span");
+            pos1 = $(".n-pages.p-serie");
+        }
+
+        pos.remove(); //Rimuovo vecchie pagine se presenti
+
+        if (nPages > 15) { //Se le pagine sono più di 15
+            nPages = 15; //Setto le pagine a 15
+        }
+
+        for (var i = 0; i < nPages; i++) { //For che crea ogni quadrato con numero pagina
+            numGen = "<span class=\"num-pag\">" + (i + 1) + "</span>"; //Assegno numero
+            pos1.append(numGen); //Appendo contenuto
+        }
+    }
+
+    function newPage(redSign,newSign,elim) { //Funzione che nasconde vecchia pagina e mostra nuova
+        redSign.removeClass("active"); //Rimuovo colore numero pagina
+        newSign.addClass("active"); //Aggiungo colore pagina
+        elim.remove(); //Rimuovo card presenti
+    }
+
     function hideShow(x,y) { //Funzione che mostra/nasconde
         x.hide();
         y.show();
@@ -476,7 +546,6 @@ $(document).ready(function() {
 
     function addRemoveClass(x,selClass,selClass2) { //Funzione che aggiunge rimuove classe
         x.addClass(selClass).removeClass(selClass2);
-
     }
 
     function appendElements(position,el) { //Funzione che appende elementi
