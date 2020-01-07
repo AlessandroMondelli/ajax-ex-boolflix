@@ -153,6 +153,11 @@ main.all {
     border: 1px solid black;
     position: relative;
     cursor: pointer;
+    transition: 2s;
+}
+
+.card.flip {
+    transform: scale(-1, 1);
 }
 
 .card.active {
@@ -225,8 +230,15 @@ main.all {
     vertical-align: middle;
 }
 
-.card:hover .info {
+.card .info {
     background-color: rgba(0, 0, 0, 0.8);
+    opacity: 1;
+    transform: scale(-1, 1);
+    opacity: 0;
+    transition: 3s;
+}
+
+.card .info.show {
     opacity: 1;
 }
 

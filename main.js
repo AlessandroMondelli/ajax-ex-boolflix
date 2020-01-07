@@ -107,6 +107,16 @@ $(document).ready(function() {
         apiActive(flagRicOrPag); //Richiamo funzione che chiama API
     });
 
+    $(document).on('click', '.card', function() { //Se viene cliccata una card
+        if ($(this).siblings().hasClass("flip")) { //Se sono presenti cards già girate...
+            $(this).siblings().removeClass("flip"); //Le rimetto al punto di partenta
+            $(this).siblings().find(".info").removeClass("show"); //Rimuovo info
+        }
+
+        $(this).addClass("flip"); //Giro quello cliccato
+        $(this).find(".info").addClass("show"); //Mostro info
+    });
+
 
 
 
