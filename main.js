@@ -14,7 +14,7 @@ $(document).ready(function() {
     var posterNotAvaible = 'https://upload.wikimedia.org/wikipedia/commons/6/64/Poster_not_available.jpg'; //Immagine in caso di poster mancante
 
     var flagsAvaible = ['it','en','fr','de','es','pt','da','mex','ja','zh','cn','tl','id','ko','vi','hi']; //Lista bandiere
-    var changeLang = 'It-it'; //Variabile globale per scelta lingua
+    var changeLang = 'IT-it'; //Variabile globale per scelta lingua
 
     //Preparo template Handlebars
     var source = $("#boolflix-template").html();
@@ -34,20 +34,22 @@ $(document).ready(function() {
         }
     });
 
-    $(".film-lang").hover(function() { //Effetto hover su lingue
+    $(".film-lang").mouseenter(function() { //Effetto hover su lingue
         $(".other-lang").slideDown();
-    },
-    function() { //quando si esce dall'hover
+    });
+    $(".film-lang").mouseleave(function() { //Effetto hover su lingue
         $(".other-lang").slideUp();
     });
 
-    $(".lang img").click(function() {
+    $(".other-lang .lang img").click(function() {
         var lang = $(this).data('lang'); //Data che riconosce quale lingua è staa cliccata
-        var temp = $(".lang#first-lan").html();
-        var outerThis = $(this).closest("li");
-        $(".film-lang #first-lan img").remove();
-        $(".film-lang #first-lan").html($(this));
-        outerThis.html(temp);
+
+        //Cambio bandiera
+        var temp = $(".lang#first-lan").html(); //Prendo codice html della prima bandiera
+        var outerThis = $(this).closest("li"); //Prendo codice html della bandiera cliccata
+        $(".film-lang #first-lan img").remove(); //Rimuovo codice da prima bandiera
+        $(".film-lang #first-lan").html($(this)); //Inserisco nova prima bandiera
+        outerThis.html(temp); //Inserisco vecchia prima bandiera nella lista delle bandiere
 
         changeLang =  lang + "-" + lang.toUpperCase(); //Codice che permette di cambiare lingua
     });
