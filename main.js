@@ -96,14 +96,18 @@ $(document).ready(function() {
     $(document).on('click', '.n-pages.p-film .num-pag', function() { //Su click su numero pagina
         pagValF = parseInt($(this).text()); //Prendo numero della pagina selezionato
         flagRicOrPag = 1 //Flag per riconoscere che l'api viene richiesta per una nuova pagina e non per una nuova ricerca
+        $("#once-searched .series .results .card").remove();
         newPage($(".n-pages.p-film span"),$(this),$("#once-searched .film .results .card")); //Richiamo funzione per mostrare nuova pagina risultati
+        
         apiActive(flagRicOrPag); //Richiamo funzione che chiama API
     });
 
     $(document).on('click', '.n-pages.p-serie .num-pag', function() { //Su click su numero pagina
         pagValS = parseInt($(this).text()); //Prendo numero della pagina selezionato
         flagRicOrPag = 2 //Flag per riconoscere che l'api viene richiesta per una nuova pagina e non per una nuova ricerca
+        $("#once-searched .film .results .card").remove();
         newPage($(".n-pages.p-serie span"),$(this),$("#once-searched .series .results .card")); //Richiamo funzione per mostrare nuova pagina risultati
+
         apiActive(flagRicOrPag); //Richiamo funzione che chiama API
     });
 

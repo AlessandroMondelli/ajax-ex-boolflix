@@ -142,8 +142,9 @@ main.all {
 .results {
     display: flex;
     justify-content: flex-start;
+    flex-wrap: wrap;
     margin-top: 13px;
-    overflow-x: auto;
+    overflow: hidden;
     color: white;
 }
 
@@ -153,7 +154,7 @@ main.all {
     border: 1px solid black;
     position: relative;
     cursor: pointer;
-    transition: 2s;
+    transition: 1s ease;
 }
 
 .card.flip {
@@ -213,7 +214,7 @@ main.all {
     position: absolute;
     top: 0px;
     opacity: 0;
-    transition: 0.2s;
+    transition: 0.1s;
     overflow-y: auto;
     padding: 0 5px;
 }
@@ -235,7 +236,7 @@ main.all {
     opacity: 1;
     transform: scale(-1, 1);
     opacity: 0;
-    transition: 3s;
+    transition: 1s;
 }
 
 .card .info.show {
